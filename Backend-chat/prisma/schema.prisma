@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ConversationType {
+  private
+  group
+}
+
+enum ParticipantRole {
+  admin
+  member
+}
+
+enum MessageStatus {
+  sent
+  delivered
+  read
+}
+
+enum CallType {
+  audio
+  video
+}
+
+enum CallState {
+  ringing
+  active
+  missed
+  ended
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  displayName  String   @map("display_name")
+  avatarUrl    String?  @map("avatar_url")
+  statusText   String?  @map("status_text")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  participations     ConversationParticipant[]
+  messagesSent       Message[]                 @relation("MessageSender")
+  callsInitiated     Call[]                    @relation("CallInitiator")
+  callParticipations CallParticipant[]
+  contactsOwned      Contact[]                 @relation("ContactOwner")
+  contactOf          Contact[]                 @relation("ContactTarget")
+  hiddenMessages     MessageDeletion[]
+  hiddenCalls        CallDeletion[]
+
+  @@map("users")
+}
+
+model Contact {
+  ownerId   String   @map("owner_id")
+  contactId String   @map("contact_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  owner   User @relation("ContactOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  contact User @relation("ContactTarget", fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([ownerId, contactId])
+  @@map("contacts")
+}
+
+model Conversation {
+  id        String           @id @default(uuid())
+  type      ConversationType
+  name      String?
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  participants ConversationParticipant[]
+  messages     Message[]
+  calls        Call[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  conversationId String          @map("conversation_id")
+  userId         String          @map("user_id")
+  role           ParticipantRole @default(member)
+  joinedAt       DateTime        @default(now()) @map("joined_at")
+  hiddenAt       DateTime?       @map("hidden_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String        @id @default(uuid())
+  conversationId String        @map("conversation_id")
+  senderId       String        @map("sender_id")
+  content        String?
+  status         MessageStatus @default(sent)
+  sentAt         DateTime      @default(now()) @map("sent_at")
+  editedAt       DateTime?     @map("edited_at")
+  deletedAt      DateTime?     @map("deleted_at")
+
+  conversation Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User              @relation("MessageSender", fields: [senderId], references: [id])
+  mediaFile    MediaFile?
+  hiddenFor    MessageDeletion[]
+
+  @@map("messages")
+}
+
+model MessageDeletion {
+  messageId String   @map("message_id")
+  userId    String   @map("user_id")
+  deletedAt DateTime @default(now()) @map("deleted_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([messageId, userId])
+  @@map("message_deletions")
+}
+
+model MediaFile {
+  id           String @id @default(uuid())
+  messageId    String @unique @map("message_id")
+  url          String
+  mimeType     String @map("mime_type")
+  size         Int
+  originalName String @map("original_name")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("media_files")
+}
+
+model Call {
+  id             String    @id @default(uuid())
+  conversationId String    @map("conversation_id")
+  initiatorId    String    @map("initiator_id")
+  type           CallType
+  state          CallState @default(ringing)
+  startedAt      DateTime  @default(now()) @map("started_at")
+  endedAt        DateTime? @map("ended_at")
+
+  conversation Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  initiator    User              @relation("CallInitiator", fields: [initiatorId], references: [id])
+  participants CallParticipant[]
+  hiddenFor    CallDeletion[]
+
+  @@map("calls")
+}
+
+model CallDeletion {
+  callId    String   @map("call_id")
+  userId    String   @map("user_id")
+  deletedAt DateTime @default(now()) @map("deleted_at")
+
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([callId, userId])
+  @@map("call_deletions")
+}
+
+model CallParticipant {
+  callId   String    @map("call_id")
+  userId   String    @map("user_id")
+  joinedAt DateTime? @map("joined_at")
+  leftAt   DateTime? @map("left_at")
+
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([callId, userId])
+  @@map("call_participants")
+}

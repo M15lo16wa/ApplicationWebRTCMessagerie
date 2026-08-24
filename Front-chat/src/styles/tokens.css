@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Palette produit — section 09 du document d'architecture. Distincte du vert WhatsApp,
+   accent ambre réservé au "direct" (appel/sonnerie), vert/rouge universels réservés
+   aux boutons répondre/raccrocher (jamais à la marque). */
+:root {
+  /* Empêche le navigateur de deviner un thème natif pour les champs de formulaire
+     (fond sombre auto sous un input non stylé si l'OS est en mode sombre, par ex.) —
+     sans ça, le fond du champ et notre --color-ink peuvent finir désynchronisés. */
+  color-scheme: light;
+  --color-primary: #1f8a6e;
+  --color-primary-tint: #dcf1e8;
+  --color-accent: #e08d3c;
+  --color-success: #2fae60;
+  --color-danger: #d64545;
+  --color-app-bg: #f3f5f1;
+  --color-surface: #ffffff;
+  --color-chat-bg: #ecf1ec;
+  --color-ink: #17221f;
+  --color-ink-soft: #5b6b66;
+  /* Bordures/séparateurs — teinte translucide dérivée de l'encre, pas un noir fixe :
+     un `border-black/10` reste quasi invisible sur un fond sombre (bug capture d'écran). */
+  --color-line: rgba(23, 34, 32, 0.12);
+}
+
+/* Volontairement pas de @media (prefers-color-scheme: dark) ici : le thème clair est
+   fixe par défaut (les maquettes du document d'architecture sont en clair) tant qu'il
+   n'y a pas de bouton de bascule. Le bloc ci-dessous reste prêt pour ce jour-là — il
+   ne s'active que si un script pose data-theme="dark" sur <html>, ce qui n'arrive pas
+   encore. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-primary: #35b893;
+  --color-primary-tint: #1b4b3c;
+  --color-accent: #f0a05e;
+  --color-success: #46c97b;
+  --color-danger: #e86363;
+  --color-app-bg: #0e1512;
+  --color-surface: #16211d;
+  --color-chat-bg: #121b17;
+  --color-ink: #e7ece9;
+  --color-ink-soft: #93a29c;
+  --color-line: rgba(231, 236, 233, 0.16);
+}
+
+body {
+  margin: 0;
+  background: var(--color-app-bg);
+  color: var(--color-ink);
+  font-family: "Inter", system-ui, sans-serif;
+}
