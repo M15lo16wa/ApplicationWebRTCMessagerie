@@ -90,9 +90,9 @@ export function MessageBubble({ message, isOwn, selectMode, selected, onEnterSel
           {selected && <Icon.Check size={12} />}
         </span>
       )}
-      <div className={`flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
+      <div className={`flex flex-col min-w-0 max-w-[78%] ${isOwn ? "items-end" : "items-start"}`}>
         <div
-          className="max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-relaxed"
+          className="rounded-2xl px-3 py-2 text-sm leading-relaxed"
           style={{
             background: isOwn ? "var(--color-primary-tint)" : "var(--color-surface)",
             color: "var(--color-ink)",
