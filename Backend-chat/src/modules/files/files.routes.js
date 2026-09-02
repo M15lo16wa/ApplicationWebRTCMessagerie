@@ -4,6 +4,7 @@ import { env } from "../../config/env.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { conversationRoom } from "../../sockets/rooms.js";
 import { filesService } from "./files.service.js";
+import { uploadParamsSchema } from "./files.validation.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -18,7 +19,7 @@ filesRouter.post("/:conversationId", upload.single("file"), async (req, res, nex
     if (!req.file) {
       return res.status(400).json({ error: "Aucun fichier reçu" });
     }
-    const { conversationId } = req.params;
+    const { conversationId } = uploadParamsSchema.parse(req.params);
     const message = await filesService.upload({
       conversationId,
       senderId: req.userId,

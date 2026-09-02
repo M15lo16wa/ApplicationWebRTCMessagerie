@@ -94,4 +94,12 @@ export const conversationsRepository = {
     });
     return participants.map((p) => p.userId);
   },
+
+  async listConversationIds(userId) {
+    const participations = await prisma.conversationParticipant.findMany({
+      where: { userId },
+      select: { conversationId: true },
+    });
+    return participations.map((p) => p.conversationId);
+  },
 };

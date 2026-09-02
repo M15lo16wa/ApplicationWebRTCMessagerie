@@ -28,3 +28,7 @@ export function registerPresenceGateway(io, socket) {
 export function isOnline(userId) {
   return onlineSockets.has(userId);
 }
+
+export function getSocketIds(userId) {
+  return [...(onlineSockets.get(userId) ?? [])];
+}

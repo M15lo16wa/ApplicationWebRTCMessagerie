@@ -1,5 +1,19 @@
+import { getSocketIds } from "../presence/presence.gateway.js";
+import { conversationRoom } from "../../sockets/rooms.js";
 import { conversationsService } from "./conversations.service.js";
 import { createGroupSchema, openPrivateSchema } from "./conversations.validation.js";
+
+function joinOtherParticipants(req, conversation) {
+  const io = req.app.get("io");
+  if (!io) return;
+  const room = conversationRoom(conversation.id);
+  for (const participant of conversation.participants) {
+    if (participant.userId === req.userId) continue;
+    for (const socketId of getSocketIds(participant.userId)) {
+      io.sockets.sockets.get(socketId)?.join(room);
+    }
+  }
+}
 
 export const conversationsController = {
   async list(req, res, next) {
@@ -15,6 +29,7 @@ export const conversationsController = {
     try {
       const { otherUserId } = openPrivateSchema.parse(req.body);
       const conversation = await conversationsService.openPrivate(req.userId, otherUserId);
+      joinOtherParticipants(req, conversation);
       res.status(201).json({ conversation });
     } catch (err) {
       next(err);
@@ -25,6 +40,7 @@ export const conversationsController = {
     try {
       const body = createGroupSchema.parse(req.body);
       const conversation = await conversationsService.createGroup(req.userId, body);
+      joinOtherParticipants(req, conversation);
       res.status(201).json({ conversation });
     } catch (err) {
       next(err);
