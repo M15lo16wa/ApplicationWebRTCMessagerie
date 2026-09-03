@@ -5,14 +5,7 @@ export const usersRepository = {
     return prisma.user.findMany({
       where: {
         id: { not: userId },
-        ...(search
-          ? {
-              OR: [
-                { displayName: { contains: search, mode: "insensitive" } },
-                { email: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : {}),
+        ...(search ? { displayName: { contains: search, mode: "insensitive" } } : {}),
       },
       select: { id: true, displayName: true, avatarUrl: true, email: true },
       orderBy: { displayName: "asc" },

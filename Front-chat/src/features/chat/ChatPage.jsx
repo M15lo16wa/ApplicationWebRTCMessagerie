@@ -47,7 +47,7 @@ export function ChatPage() {
   }
 
   return (
-    <div className="h-screen flex bg-app overflow-hidden">
+    <div className="h-dvh flex bg-app overflow-hidden">
       <div className={`${showDetail ? "hidden" : "flex"} w-full md:w-auto md:flex flex-shrink-0`}>
         <IconRail
           view={view}

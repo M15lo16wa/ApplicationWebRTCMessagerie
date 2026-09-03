@@ -6,7 +6,7 @@ export function ProtectedRoute({ children }) {
   const user = useAuthStore((state) => state.user);
 
   if (status === "idle" || status === "loading") {
-    return <div className="min-h-screen flex items-center justify-center text-ink-soft">Chargement…</div>;
+    return <div className="min-h-dvh flex items-center justify-center text-ink-soft">Chargement…</div>;
   }
   if (!user) {
     return <Navigate to="/login" replace />;

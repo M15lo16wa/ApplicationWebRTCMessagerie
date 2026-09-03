@@ -37,7 +37,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-app px-4">
+    <div className="min-h-dvh flex items-center justify-center bg-app px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm bg-surface rounded-2xl shadow-sm p-8 flex flex-col items-center gap-5"

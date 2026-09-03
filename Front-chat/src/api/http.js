@@ -18,11 +18,14 @@ http.interceptors.request.use((config) => {
 
 let refreshInFlight = null;
 
+const AUTH_ENDPOINTS_WITHOUT_RETRY = ["/auth/login", "/auth/register", "/auth/refresh"];
+
 http.interceptors.response.use(
   (response) => response,
   async (error) => {
     const { config, response } = error;
-    if (response?.status !== 401 || config.__isRetry) {
+    const isAuthEndpoint = AUTH_ENDPOINTS_WITHOUT_RETRY.some((path) => config?.url?.includes(path));
+    if (response?.status !== 401 || config.__isRetry || isAuthEndpoint) {
       throw error;
     }
     config.__isRetry = true;
