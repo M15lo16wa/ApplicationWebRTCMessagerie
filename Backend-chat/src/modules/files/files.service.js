@@ -1,6 +1,6 @@
 import { HttpError } from "../../lib/httpError.js";
 import { messagesService } from "../messages/messages.service.js";
-import { localStorageProvider } from "./storageProvider.js";
+import { storageProvider } from "./storageProvider.js";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/png",
@@ -23,7 +23,7 @@ export const filesService = {
     if (!ALLOWED_MIME_TYPES.has(mimeType)) {
       throw new HttpError(415, "Type de fichier non autorisé");
     }
-    const { url } = await localStorageProvider.save(file.buffer, mimeType);
+    const { url } = await storageProvider.save(file.buffer, mimeType);
     return messagesService.sendFile({
       conversationId,
       senderId,

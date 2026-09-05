@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { env } from "../../config/env.js";
 import { HttpError } from "../../lib/httpError.js";
-import { localStorageProvider } from "../files/storageProvider.js";
+import { storageProvider } from "../files/storageProvider.js";
 import { authRepository } from "./auth.repository.js";
 
 const BCRYPT_COST = 12;
@@ -86,7 +86,7 @@ export const authService = {
     if (!ALLOWED_AVATAR_MIME_TYPES.has(file.mimetype)) {
       throw new HttpError(415, "Format d'image non autorisé");
     }
-    const { url } = await localStorageProvider.save(file.buffer, file.mimetype);
+    const { url } = await storageProvider.save(file.buffer, file.mimetype);
     const user = await authRepository.update(userId, { avatarUrl: url });
     return toPublicUser(user);
   },

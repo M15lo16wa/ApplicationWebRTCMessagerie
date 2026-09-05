@@ -1,7 +1,10 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../components/Avatar.jsx";
 import { Icon } from "../../components/icons.jsx";
 import { useAuthStore } from "../../store/authStore.js";
+
+const MAX_SIZE_MB = Number(import.meta.env.VITE_UPLOAD_MAX_SIZE_MB ?? 15);
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 function EditableField({ label, value, onSave }) {
   const [editing, setEditing] = useState(false);
@@ -44,13 +47,30 @@ export function ProfilePanel({ onClose }) {
   const logout = useAuthStore((state) => state.logout);
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!error) return;
+    const timeout = setTimeout(() => setError(null), 5000);
+    return () => clearTimeout(timeout);
+  }, [error]);
 
   async function handleAvatarChange(event) {
     const file = event.target.files?.[0];
     if (!file) return;
+    setError(null);
+
+    if (file.size > MAX_SIZE_BYTES) {
+      setError(`Cette image dépasse la taille recommandée (${MAX_SIZE_MB} Mo).`);
+      event.target.value = "";
+      return;
+    }
+
     setUploading(true);
     try {
       await uploadAvatar(file);
+    } catch (err) {
+      setError(err.response?.data?.error ?? "Envoi de la photo impossible");
     } finally {
       setUploading(false);
       event.target.value = "";
@@ -67,6 +87,7 @@ export function ProfilePanel({ onClose }) {
       </div>
 
       <div className="flex flex-col items-center gap-2 py-6 border-b border-line">
+        {error && <p className="text-xs text-danger text-center px-4">{error}</p>}
         <div className="relative">
           <Avatar name={user?.displayName} src={user?.avatarUrl} size={84} />
           <button

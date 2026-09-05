@@ -22,4 +22,12 @@ export const env = {
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "7d",
   },
   uploadMaxSizeMb: Number(process.env.UPLOAD_MAX_SIZE_MB ?? 15),
+  minio: {
+    endPoint: process.env.MINIO_ENDPOINT ?? "localhost",
+    port: Number(process.env.MINIO_PORT ?? 9000),
+    useSSL: process.env.MINIO_USE_SSL === "true",
+    accessKey: process.env.MINIO_ACCESS_KEY ?? "minioadmin",
+    secretKey: process.env.MINIO_SECRET_KEY ?? "minioadmin",
+    bucket: process.env.MINIO_BUCKET ?? "chat-uploads",
+  },
 };

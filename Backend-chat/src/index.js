@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { exec } from "node:child_process";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
@@ -14,6 +15,7 @@ import { callsRouter } from "./modules/calls/calls.routes.js";
 import { contactsRouter } from "./modules/contacts/contacts.routes.js";
 import { conversationsRouter } from "./modules/conversations/conversations.routes.js";
 import { filesRouter } from "./modules/files/files.routes.js";
+import { uploadsRouter } from "./modules/files/uploads.routes.js";
 import { messagesRouter } from "./modules/messages/messages.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
 import { createSocketServer } from "./sockets/index.js";
@@ -25,7 +27,7 @@ const app = express();
 app.use(cors({ origin: env.clientOrigins, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
+app.use("/uploads", uploadsRouter);
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
@@ -56,3 +58,16 @@ httpServer.listen(env.port, () => {
     console.warn("Aucun certificat trouvé dans /certs — HTTP seulement (micro bloqué hors localhost).");
   }
 });
+
+let shuttingDown = false;
+function shutdown() {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  httpServer.close();
+  exec("docker compose stop", { cwd: path.resolve(__dirname, "..") }, () => {
+    process.exit(0);
+  });
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

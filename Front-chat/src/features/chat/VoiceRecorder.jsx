@@ -68,8 +68,8 @@ export function VoiceRecorder({ conversationId, onRecordingChange }) {
           const formData = new FormData();
           formData.append("file", blob, `vocal-${Date.now()}.webm`);
           await http.post(`/files/${conversationId}`, formData);
-        } catch {
-          setError("Envoi du message vocal impossible");
+        } catch (err) {
+          setError(err.response?.data?.error ?? "Envoi du message vocal impossible");
         } finally {
           setUploading(false);
         }
