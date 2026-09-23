@@ -71,44 +71,25 @@ psql -U <UTILISATEUR> -c "CREATE DATABASE \"ChatPublic\";"
 ```bash
 npm install
 ```
-
-### 4. Démarrer Docker Compose (MinIO)
-
-```bash
-docker compose up -d
-```
-
-Vérifier que MinIO répond : console web sur http://localhost:9001 (minioadmin / minioadmin).
-
-> `npm run dev` exécute automatiquement `docker compose up -d` (script `predev`)
-> avant de lancer le serveur. Mais pour `npm start`, il faut le faire manuellement.
-
-### 5. Appliquer les migrations Prisma
+### 4. Appliquer les migrations Prisma
 
 ⚠️ PostgreSQL doit être démarré **avant** cette étape. Sans base accessible, les
 migrations échouent et le backend plante ensuite.
 
 ```bash
-npm run prisma:migrate    # = prisma migrate dev
-npm run prisma:generate   # = prisma generate (regénère le client)
+npm run prisma:migrate    # = prisma migrate
 ```
-
-### 6. Lancer le backend
+### 5. Lancer le backend
 
 ```bash
 npm run dev     # développement : nodemon (reload auto) + docker compose up -d automatique
 ```
-
-ou en mode production :
-
-```bash
-npm start       # node src/index.js (penser à `docker compose up -d` avant)
-```
+> `npm run dev` exécute automatiquement `docker compose up -d`
 
 Le serveur démarre sur **https://localhost:4000** (HTTP seul si les fichiers
 `../certs/dev-cert.pem` et `../certs/dev-key.pem` n'existent pas).
 
-### 7. Vérifier que tout fonctionne
+### 6. Vérifier que tout fonctionne
 
 ```bash
 curl https://localhost:4000/health
