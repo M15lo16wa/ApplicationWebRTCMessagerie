@@ -120,9 +120,8 @@ curl https://localhost:4000/health
 
 | Commande                | Description                                    |
 | ----------------------- | ---------------------------------------------- |
-| `npm run dev`           | `docker compose up -d` (predev) + nodemon       |
-| `npm start`             | Lance `node src/index.js` directement           |
-| `npm run prisma:migrate`| Applique les migrations (`prisma migrate dev`)  |
+| `npm run dev`           | `docker compose up -d` (predev) + nodemon       |           |
+| `npm run prisma:migrate`| Applique les migrations  |
 | `npm run prisma:generate`| Regénère le client Prisma                       |
 | `npm run prisma:studio` | Ouvre l'interface de gestion de la base         |
 
